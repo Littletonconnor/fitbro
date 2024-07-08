@@ -1,0 +1,35 @@
+# Dependency directories
+node_modules
+bower_components
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Dist/build output
+dist
+build
+
+# Next.js build output
+.next
+
+# Storybook build output
+storybook-static
+
+# Log files
+*.log
+
+# Environment configs
+.env
+
+# Temp files
+*.tmp
+*.temp
+
+# IDE specific files
+.idea
+.vscode
+*.iml
+
+# Other
+coverage
