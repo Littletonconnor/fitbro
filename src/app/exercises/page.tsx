@@ -2,11 +2,42 @@
 
 import * as React from 'react'
 import { Search } from 'lucide-react'
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
 import { Button } from '@/components/button'
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/chart'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/dialog'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/drawer'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/dropdown-menu'
 import { Input } from '@/components/input'
+import { Label } from '@/components/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
-import { CaretSortIcon } from '@radix-ui/react-icons'
+import { useMediaQuery } from '@/hooks/use-media-query'
+import { cn } from '@/lib/utils'
+import { CaretSortIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -78,40 +109,87 @@ export interface Payment {
   lbs: number
 }
 
-export const columns: ColumnDef<Payment>[] = [
-  {
-    accessorKey: 'exercise',
-    header: () => <div className="text-left">Exercise</div>,
-    cell: ({ row }) => <div className="capitalize">{row.getValue('exercise')}</div>,
-  },
-  {
-    accessorKey: 'date',
-    header: () => <div className="text-right">Date</div>,
-    cell: ({ row }) => {
-      return <div className="text-right font-medium">{row.getValue('date')}</div>
-    },
-  },
-  {
-    accessorKey: 'reps',
-    header: () => <div className="text-right">Reps</div>,
-    cell: ({ row }) => {
-      return <div className="text-right font-medium">{row.getValue('reps')}</div>
-    },
-  },
-  {
-    accessorKey: 'lbs',
-    header: () => <div className="text-right">Lbs</div>,
-    cell: ({ row }) => {
-      return <div className="text-right font-medium">{row.getValue('lbs')}</div>
-    },
-  },
+const chartData = [
+  { month: 'January', desktop: 186, mobile: 80 },
+  { month: 'February', desktop: 305, mobile: 200 },
+  { month: 'March', desktop: 237, mobile: 120 },
+  { month: 'April', desktop: 73, mobile: 190 },
+  { month: 'May', desktop: 209, mobile: 130 },
+  { month: 'June', desktop: 214, mobile: 140 },
 ]
+
+const chartConfig = {
+  desktop: {
+    label: 'Desktop',
+    color: '#2563eb',
+  },
+  mobile: {
+    label: 'Mobile',
+    color: '#60a5fa',
+  },
+} satisfies ChartConfig
 
 export function ExercisesTable() {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
+
+  const [open, setOpen] = React.useState(false)
+  const isDesktop = useMediaQuery('(min-width: 768px)')
+
+  const columns: ColumnDef<Payment>[] = React.useMemo(
+    () => [
+      {
+        accessorKey: 'exercise',
+        header: () => <div className="text-left">Exercise</div>,
+        cell: ({ row }) => <div className="capitalize font-medium">{row.getValue('exercise')}</div>,
+      },
+      {
+        accessorKey: 'date',
+        header: () => <div className="text-right">Date</div>,
+        cell: ({ row }) => {
+          return <div className="text-right">{row.getValue('date')}</div>
+        },
+      },
+      {
+        accessorKey: 'reps',
+        header: () => <div className="text-right">Reps</div>,
+        cell: ({ row }) => {
+          return <div className="text-right">{row.getValue('reps')}</div>
+        },
+      },
+      {
+        accessorKey: 'lbs',
+        header: () => <div className="text-right">Lbs</div>,
+        cell: ({ row }) => {
+          return <div className="text-right">{row.getValue('lbs')}</div>
+        },
+      },
+      {
+        id: 'actions',
+        enableHiding: false,
+        cell: () => {
+          return (
+            <div className="w-full text-right">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <DotsHorizontalIcon className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setOpen(true)}>View details</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )
+        },
+      },
+    ],
+    [],
+  )
 
   const table = useReactTable({
     data,
@@ -133,7 +211,7 @@ export function ExercisesTable() {
   })
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-screen-2xl">
       <form className="flex items-center mb-4">
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -207,6 +285,137 @@ export function ExercisesTable() {
           </Button>
         </div>
       </div>
+      {isDesktop ? (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent className="sm:max-w-xl max-h-[calc(100%-80px)] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Squat</DialogTitle>
+              <DialogDescription>Squat progression over time</DialogDescription>
+            </DialogHeader>
+            <h3 className="text-md font-semibold">Weight</h3>
+            <ChartContainer config={chartConfig} className="w-full">
+              <BarChart accessibilityLayer data={chartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+            <h3 className="text-md font-semibold">One Rep Max</h3>
+            <ChartContainer config={chartConfig} className="w-full">
+              <BarChart accessibilityLayer data={chartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+            <h3 className="text-md font-semibold">Set Volume</h3>
+            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+              <BarChart accessibilityLayer data={chartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+          </DialogContent>
+        </Dialog>
+      ) : (
+        <Drawer open={open} onOpenChange={setOpen}>
+          <DrawerContent className="max-h-[calc(100%-80px)]">
+            <DrawerHeader className="text-left">
+              <DrawerTitle>Edit profile</DrawerTitle>
+              <DrawerDescription>
+                Make changes to your profile here. Click save when you&apos;re done.
+              </DrawerDescription>
+            </DrawerHeader>
+            <ChartContainer config={chartConfig} className="w-full">
+              <BarChart accessibilityLayer data={chartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+            <h3 className="text-md font-semibold">One Rep Max</h3>
+            <ChartContainer config={chartConfig} className="w-full">
+              <BarChart accessibilityLayer data={chartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+            <h3 className="text-md font-semibold">Set Volume</h3>
+            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+              <BarChart accessibilityLayer data={chartData}>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) => value.slice(0, 3)}
+                />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+            <DrawerFooter className="pt-2">
+              <DrawerClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      )}
     </div>
+  )
+}
+
+function ProfileForm({ className }: React.ComponentProps<'form'>) {
+  return (
+    <form className={cn('grid items-start gap-4', className)}>
+      <div className="grid gap-2">
+        <Label htmlFor="email">Email</Label>
+        <Input type="email" id="email" defaultValue="shadcn@example.com" />
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="username">Username</Label>
+        <Input id="username" defaultValue="@shadcn" />
+      </div>
+      <Button type="submit">Save changes</Button>
+    </form>
   )
 }
