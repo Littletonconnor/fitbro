@@ -4,18 +4,7 @@ import { Inter as FontSans } from 'next/font/google'
 
 import '@/styles/globals.css'
 
-import {
-  Bell,
-  CircleUser,
-  Home,
-  LineChart,
-  Menu,
-  Package,
-  Package2,
-  Search,
-  ShoppingCart,
-  Users,
-} from 'lucide-react'
+import { CircleUser, Home, Menu, Package, Package2, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -28,7 +17,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/dropdown-menu'
-import { Input } from '@/components/input'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/sheet'
 import { cn } from '@/lib/utils'
 
@@ -49,7 +37,7 @@ interface NavLinkProps {
 
 const headerLinks: NavLinkProps[] = [
   { href: '/', label: 'Dashboard', icon: Home },
-  { href: '/routines', label: 'Routines', icon: ShoppingCart },
+  { href: '/workouts', label: 'Workouts', icon: ShoppingCart },
   { href: '/exercises', label: 'Exercises', icon: Package },
 ]
 
@@ -114,7 +102,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </header>
-            <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">{children}</main>
+            <main className="flex flex-1 flex-col gap-4 p-8 lg:gap-6 lg:px-12 lg:py-6">
+              {children}
+            </main>
           </div>
         </div>
       </body>
