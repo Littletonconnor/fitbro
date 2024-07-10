@@ -13,7 +13,6 @@ import {
 } from '@/components/dropdown-menu'
 import { Input } from '@/components/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/table'
-import { useMediaQuery } from '@/hooks/use-media-query'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
   ColumnDef,
