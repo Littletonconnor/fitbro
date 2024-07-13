@@ -41,10 +41,10 @@ export default function Page({ params }: PageProps) {
   return (
     <div className="flex flex-col w-full max-w-5xl">
       <h1 className="text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
-        Squat
+        Inline Bench Press
       </h1>
       <p className="text-lg font-light text-foreground mt-2 mb-4 lg:mb-12">
-        Squat progression over time
+        Inline Bench Press progression over time
       </p>
       <div className="space-y-12">
         <WeightChart />

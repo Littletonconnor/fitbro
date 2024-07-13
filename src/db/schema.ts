@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const users = sqliteTable('users', {
@@ -45,7 +45,39 @@ export const sets = sqliteTable('sets', {
   updatedAt: text('updated_at').default(sql`(CURRENT_TIME)`),
 })
 
+// ---- Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  workouts: many(workouts),
+}))
+
+export const workoutsRelations = relations(workouts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [workouts.userId],
+    references: [users.id],
+  }),
+  exercises: many(exercises),
+}))
+
+export const exerciseRelation = relations(exercises, ({ one, many }) => ({
+  workout: one(workouts, {
+    fields: [exercises.workoutId],
+    references: [workouts.id],
+  }),
+  sets: many(sets),
+}))
+
+export const setsRelation = relations(sets, ({ one }) => ({
+  exercise: one(exercises, {
+    fields: [sets.exerciseId],
+    references: [exercises.id],
+  }),
+}))
+
 export type User = typeof users.$inferSelect
 export type Workout = typeof workouts.$inferSelect
 export type Exercise = typeof exercises.$inferSelect
 export type Set = typeof sets.$inferSelect
+
+export type ExerciseWithSets = Exercise & {
+  sets: Set[]
+}

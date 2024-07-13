@@ -4,14 +4,15 @@ import { db } from '@/db'
 import {
   Exercise,
   exercises as exercisesSchema,
-  Set,
   sets as setsSchema,
   users as usersSchema,
   workouts as workoutsSchema,
+  type Set,
   type User,
   type Workout,
 } from '@/db/schema'
 import { faker } from '@faker-js/faker'
+import { FAKE_DATA } from './seed-utils'
 
 function randomInt(min = 3, max = 5) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -19,8 +20,8 @@ function randomInt(min = 3, max = 5) {
 
 const USERS = 3
 const WORKOUTS = randomInt()
-const EXERCISES = randomInt()
-const SETS = randomInt()
+const EXERCISES = randomInt(20, 20)
+const SETS = randomInt(3, 3)
 
 async function seed() {
   console.time('🌱 Database has been seeded.')
@@ -81,16 +82,18 @@ export async function createExercises(workouts: Workout[]) {
 
 export async function createSets(exercises: Exercise[]) {
   console.time('📶 Created Sets')
-  await db.insert(setsSchema).values(
-    Array.from({ length: SETS }, () => {
-      const randomExercise = exercises[randomInt(0, exercises.length - 1)]
-      return {
+  const setValues = []
+  for (let i = 0; i < EXERCISES; i++) {
+    for (let j = 0; j < SETS; j++) {
+      setValues.push({
         ...createSet(),
-        exerciseId: randomExercise.id,
-      }
-    }),
-  )
+        exerciseId: exercises[i].id,
+      })
+    }
+  }
+  const sets = await db.insert(setsSchema).values(setValues).returning()
   console.timeEnd('📶 Created Sets')
+  return sets
 }
 
 async function deleteData() {
@@ -117,7 +120,7 @@ function createWorkout(): Workout {
   return {
     id: randomInt(0, Number.MAX_SAFE_INTEGER),
     userId: randomInt(0, Number.MAX_SAFE_INTEGER),
-    name: faker.word.noun(),
+    name: FAKE_DATA.workouts.names[randomInt(0, FAKE_DATA.workouts.names.length - 1)],
     description: faker.lorem.sentence(),
     date: faker.date.past().toISOString(),
     createdAt: faker.date.past().toISOString(),
@@ -129,7 +132,7 @@ function createExercise(): Exercise {
   return {
     id: randomInt(0, Number.MAX_SAFE_INTEGER),
     workoutId: randomInt(0, Number.MAX_SAFE_INTEGER),
-    name: faker.word.noun(),
+    name: FAKE_DATA.exercises.names[randomInt(0, FAKE_DATA.exercises.names.length - 1)],
     order: faker.number.int({ min: 1, max: 10 }),
     note: faker.lorem.sentence(),
     createdAt: faker.date.past().toISOString(),
@@ -148,4 +151,9 @@ function createSet(): Set {
   }
 }
 
-seed()
+try {
+  seed()
+} catch (e) {
+  console.error('Oh no! The seed script failed', e)
+  process.exit(1)
+}
