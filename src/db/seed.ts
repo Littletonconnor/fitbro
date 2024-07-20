@@ -110,7 +110,7 @@ function createUser(): User {
     id: randomInt(0, Number.MAX_SAFE_INTEGER),
     name: faker.person.fullName(),
     email: faker.internet.email(),
-    passwordHash: bcrypt.hashSync(faker.internet.password(), 10),
+    passwordHash: bcrypt.hashSync('root-123', 10),
     createdAt: faker.date.past().toISOString(),
     updatedAt: faker.date.past().toISOString(),
   }
