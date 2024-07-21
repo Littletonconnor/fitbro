@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { db } from '@/db'
-import { setSession } from './session'
+import { removeSession, setSession } from './session'
 
 const schema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -54,4 +54,10 @@ export async function authenticate(_currentState: unknown, formData: FormData) {
 
   setSession(user)
   redirect('/dashboard')
+}
+
+export async function logout() {
+  console.log('REMOVING SESSION')
+  await removeSession()
+  redirect('/login')
 }

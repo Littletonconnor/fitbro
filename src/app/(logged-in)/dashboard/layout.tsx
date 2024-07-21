@@ -5,7 +5,7 @@ import '@/styles/globals.css'
 import { CircleUser, Home, Menu, Package, Package2, ShoppingCart } from 'lucide-react'
 import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
-import { redirect, usePathname } from 'next/navigation'
+import { redirect, usePathname, useRouter } from 'next/navigation'
 
 import { Button } from '@/components/button'
 import {
@@ -36,12 +36,14 @@ const headerLinks: NavLinkProps[] = [
 ]
 
 export default function RootLayout({ children }: RootLayoutProps) {
+  const router = useRouter()
+
   const handleLogout = async () => {
     await fetch('/api/logout', {
       method: 'DELETE',
     })
 
-    revalidatePath('/dashboard')
+    router.push('/login')
   }
 
   return (
