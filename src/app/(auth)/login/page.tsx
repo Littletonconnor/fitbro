@@ -11,6 +11,7 @@ import { authenticate } from '@/lib/actions'
 
 export default function Login() {
   const [state, dispatch] = useFormState(authenticate, undefined)
+  console.log('STATE', state)
 
   return (
     <div className="w-full py-20">
@@ -20,10 +21,10 @@ export default function Login() {
           <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4">
+          <form action={dispatch} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="m@example.com" required />
+              <Input id="email" name="email" type="email" placeholder="me@example.com" required />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -32,10 +33,10 @@ export default function Login() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" name="password" type="password" required />
             </div>
             <LoginButton />
-          </div>
+          </form>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
             <Link href="#" className="underline">

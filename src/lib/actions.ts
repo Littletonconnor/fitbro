@@ -4,10 +4,11 @@ import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
 import { db } from '@/db'
+import { setSession } from './session'
 
 const schema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(8, { message: 'Password must be at least 8 characters long' }),
+  password: z.string().min(3, { message: 'Password must be at least 8 characters long' }),
 })
 
 export async function authenticate(_currentState: unknown, formData: FormData) {
@@ -18,7 +19,7 @@ export async function authenticate(_currentState: unknown, formData: FormData) {
 
   if (!result.success) {
     return {
-      errors: ['Invalid data submission'],
+      errors: result.error.issues.map((issue) => issue.message),
     }
   }
 
@@ -42,6 +43,7 @@ export async function authenticate(_currentState: unknown, formData: FormData) {
     }
   }
 
+  setSession(user)
   // create user
   // create session
 }
