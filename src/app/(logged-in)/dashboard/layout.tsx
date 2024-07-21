@@ -3,8 +3,9 @@
 import '@/styles/globals.css'
 
 import { CircleUser, Home, Menu, Package, Package2, ShoppingCart } from 'lucide-react'
+import { revalidatePath } from 'next/cache'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { redirect, usePathname } from 'next/navigation'
 
 import { Button } from '@/components/button'
 import {
@@ -35,6 +36,14 @@ const headerLinks: NavLinkProps[] = [
 ]
 
 export default function RootLayout({ children }: RootLayoutProps) {
+  const handleLogout = async () => {
+    await fetch('/api/logout', {
+      method: 'DELETE',
+    })
+
+    revalidatePath('/dashboard')
+  }
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <div className="hidden border-r bg-muted/40 md:block">
@@ -88,7 +97,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
               <DropdownMenuSeparator />
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

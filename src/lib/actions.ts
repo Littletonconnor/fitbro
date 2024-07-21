@@ -1,6 +1,7 @@
 'use server'
 
 import bcrypt from 'bcryptjs'
+import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 import { db } from '@/db'
@@ -8,7 +9,11 @@ import { setSession } from './session'
 
 const schema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(3, { message: 'Password must be at least 8 characters long' }),
+  password: z
+    .string()
+    .min(8, { message: 'Password must be at least 8 characters long' })
+    .regex(/[a-zA-Z]/, { message: 'Password must contain at least one letter (a-z, A-Z)' })
+    .regex(/[0-9]/, { message: 'Password must contain at least one digit (0-9)' }),
 })
 
 export async function authenticate(_currentState: unknown, formData: FormData) {
@@ -18,8 +23,10 @@ export async function authenticate(_currentState: unknown, formData: FormData) {
   })
 
   if (!result.success) {
+    const fieldErrors = result.error.flatten().fieldErrors
     return {
-      errors: result.error.issues.map((issue) => issue.message),
+      success: false,
+      fieldErrors,
     }
   }
 
@@ -31,6 +38,7 @@ export async function authenticate(_currentState: unknown, formData: FormData) {
 
   if (!user) {
     return {
+      success: false,
       errors: ['Invalid email or password'],
     }
   }
@@ -39,11 +47,11 @@ export async function authenticate(_currentState: unknown, formData: FormData) {
 
   if (!passwordHash) {
     return {
+      success: false,
       errors: ['Invalid email or password'],
     }
   }
 
   setSession(user)
-  // create user
-  // create session
+  redirect('/dashboard')
 }

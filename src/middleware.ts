@@ -1,11 +1,16 @@
 import { NextRequest } from 'next/server'
 
-import { updateSession } from '@/lib/session'
+import { getSession, updateSession } from '@/lib/session'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
+  const session = await getSession(request)
+  if (!session) {
+    return Response.redirect(new URL('/login', request.url))
+  }
+
   return updateSession(request)
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: ['/dashboard/:path*', '/workouts/:path*', '/exercises/:path*'],
 }

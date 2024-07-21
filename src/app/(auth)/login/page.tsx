@@ -20,10 +20,22 @@ export default function Login() {
           <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
+          {state?.errors && <p className="text-sm mb-4 text-red-600">{state.errors[0]}</p>}
           <form action={dispatch} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" type="email" placeholder="me@example.com" required />
+              <Input
+                id="email"
+                name="email"
+                aria-invalid={!!state?.fieldErrors?.email}
+                aria-describedby="email-error"
+                type="email"
+              />
+              {state?.fieldErrors?.email && (
+                <p id="email-error" className="px-1 text-xs text-red-600">
+                  {state?.fieldErrors.email[0]}
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
@@ -32,7 +44,17 @@ export default function Login() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" name="password" type="password" required />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                aria-invalid={!!state?.fieldErrors?.password}
+              />
+              {state?.fieldErrors?.password && (
+                <p id="password-error" className="px-1 text-xs text-red-600">
+                  {state?.fieldErrors.password[0]}
+                </p>
+              )}
             </div>
             <LoginButton />
           </form>
@@ -58,7 +80,13 @@ function LoginButton() {
   }
 
   return (
-    <Button type="submit" className="w-full" aria-disabled={pending} onClick={handleClick}>
+    <Button
+      type="submit"
+      disabled={pending}
+      className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+      aria-disabled={pending}
+      onClick={handleClick}
+    >
       Create an account
     </Button>
   )
