@@ -4,6 +4,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { User } from '@/db/schema'
 
+// TODO:
+// Update sessions to only include user id and not the whole user object.
+
 const JWT_SECRET = process.env.JWT_SECRET
 const key = new TextEncoder().encode(JWT_SECRET)
 

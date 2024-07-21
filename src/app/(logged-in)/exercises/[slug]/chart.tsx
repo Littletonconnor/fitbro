@@ -68,7 +68,7 @@ export function WeightChart({ exercises }: Props) {
   })
 
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <h3 className="text-md font-semibold">Weight</h3>
       <ChartContainer config={weightChartConfig} className="aspect-auto h-[350px] w-full">
         <AreaChart
@@ -138,7 +138,7 @@ export function WeightChart({ exercises }: Props) {
 
 export function SetChart() {
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <h3 className="text-md font-semibold">Set Volume</h3>
       <ChartContainer config={chartConfig} className="aspect-auto h-[350px] w-full">
         <BarChart
@@ -196,7 +196,7 @@ export function SetChart() {
 }
 export function OneRepMaxChart() {
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="flex w-full flex-col gap-4">
       <h3 className="text-md font-semibold">One Rep Max</h3>
       <ChartContainer config={chartConfig} className="aspect-auto h-[350px] w-full">
         <BarChart

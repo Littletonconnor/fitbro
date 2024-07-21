@@ -23,6 +23,9 @@ const WORKOUTS = randomInt()
 const EXERCISES = randomInt(20, 20)
 const SETS = randomInt(3, 3)
 
+const PERSONAL_WORKOUTS = 30
+const HISTORICAL_DAYS = 180
+
 async function seed() {
   console.time('🌱 Database has been seeded.')
   await deleteData()
@@ -81,20 +84,20 @@ export async function createExercises(workouts: Workout[]) {
   return exercises
 }
 
-async function createPersonalUser() {
-  console.time('👤 Created personal user')
-  const user = await db
-    .insert(usersSchema)
-    .values({
-      ...createUser(),
-      name: 'Littleton Connor',
-      email: 'littletonconnor@gmail.com',
-      passwordHash: bcrypt.hashSync('root-123', 10),
-    })
-    .returning()
-  console.timeEnd('👤 Created personal user')
-  return user
-}
+// async function createPersonalUser() {
+//   console.time('👤 Created personal user')
+//   const user = await db
+//     .insert(usersSchema)
+//     .values({
+//       ...createUser(),
+//       name: 'Littleton Connor',
+//       email: 'littletonconnor@gmail.com',
+//       passwordHash: bcrypt.hashSync('root-123', 10),
+//     })
+//     .returning()
+//   console.timeEnd('👤 Created personal user')
+//   return user
+// }
 
 export async function createSets(exercises: Exercise[]) {
   console.time('📶 Created Sets')
@@ -133,43 +136,87 @@ function createUser(): User {
 }
 
 function createWorkout(): Workout {
+  const workoutName = FAKE_DATA.workouts.names[randomInt(0, FAKE_DATA.workouts.names.length - 1)]
+  const description = `A comprehensive ${workoutName} workout targeting specific muscle groups for optimal results.`
   return {
     id: randomInt(0, Number.MAX_SAFE_INTEGER),
     userId: randomInt(0, Number.MAX_SAFE_INTEGER),
-    name: FAKE_DATA.workouts.names[randomInt(0, FAKE_DATA.workouts.names.length - 1)],
-    description: faker.lorem.sentence(),
-    date: faker.date.past().toISOString(),
-    createdAt: faker.date.past().toISOString(),
-    updatedAt: faker.date.past().toISOString(),
+    name: workoutName,
+    description: description,
+    date: faker.date.recent().toISOString(),
+    createdAt: faker.date.recent().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
   }
 }
 
 function createExercise(): Exercise {
+  const exerciseName = FAKE_DATA.exercises.names[randomInt(0, FAKE_DATA.exercises.names.length - 1)]
   return {
     id: randomInt(0, Number.MAX_SAFE_INTEGER),
     workoutId: randomInt(0, Number.MAX_SAFE_INTEGER),
-    name: FAKE_DATA.exercises.names[randomInt(0, FAKE_DATA.exercises.names.length - 1)],
-    order: faker.number.int({ min: 1, max: 10 }),
-    note: faker.lorem.sentence(),
-    createdAt: faker.date.past().toISOString(),
-    updatedAt: faker.date.past().toISOString(),
+    name: exerciseName,
+    order: randomInt(1, 10),
+    note: `Perform ${exerciseName} with proper form for maximum efficiency.`,
+    createdAt: faker.date.recent().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
   }
 }
 
-function createSet(): Set {
+function createSet(daysBack = 0): Set {
+  const date = faker.date.past({ refDate: new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000) })
   return {
     id: randomInt(0, Number.MAX_SAFE_INTEGER),
     exerciseId: randomInt(0, Number.MAX_SAFE_INTEGER),
     reps: faker.number.int({ min: 8, max: 12 }),
     weight: faker.number.int({ min: 100, max: 200 }),
-    createdAt: faker.date.past().toISOString(),
-    updatedAt: faker.date.past().toISOString(),
+    createdAt: date.toISOString(),
+    updatedAt: date.toISOString(),
   }
+}
+
+async function createPersonalUser() {
+  console.time('👤 Created personal user with workouts')
+  const user = await db
+    .insert(usersSchema)
+    .values({
+      ...createUser(),
+      name: 'Littleton Connor',
+      email: 'littletonconnor@gmail.com',
+      passwordHash: bcrypt.hashSync('root-123', 10),
+    })
+    .returning()
+
+  const workouts = Array.from({ length: PERSONAL_WORKOUTS }, () => {
+    return {
+      ...createWorkout(),
+      userId: user[0].id,
+    }
+  })
+  await db.insert(workoutsSchema).values(workouts)
+
+  let exercises: Exercise[] = []
+  for (const workout of workouts) {
+    for (let i = 0; i < EXERCISES; i++) {
+      exercises.push({ ...createExercise(), workoutId: workout.id })
+    }
+  }
+
+  await db.insert(exercisesSchema).values(exercises)
+
+  const sets: Set[] = []
+  for (const exercise of exercises) {
+    for (let i = 0; i < SETS; i++) {
+      sets.push({ ...createSet(HISTORICAL_DAYS), exerciseId: exercise.id })
+    }
+  }
+  await db.insert(setsSchema).values(sets)
+  console.timeEnd('👤 Created personal user with workouts')
+  return user
 }
 
 try {
   seed()
 } catch (e) {
-  console.error('Oh no! The seed script failed', e)
+  console.error('Oh no! The seed script failed.', e)
   process.exit(1)
 }

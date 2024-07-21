@@ -28,11 +28,11 @@ export default async function Page({ params }: PageProps) {
 
   const exerciseName = result[0].name
   return (
-    <div className="flex flex-col w-full max-w-5xl">
-      <h1 className="capitalize text-3xl font-bold leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
+    <div className="flex w-full max-w-5xl flex-col">
+      <h1 className="text-3xl font-bold capitalize leading-tight tracking-tighter md:text-4xl lg:leading-[1.1]">
         {exerciseName}
       </h1>
-      <p className="text-lg font-light text-foreground mt-2 mb-4 lg:mb-12">Progression over time</p>
+      <p className="text-foreground mb-4 mt-2 text-lg font-light lg:mb-12">Progression over time</p>
       <div className="space-y-12">
         <WeightChart exercises={results} />
         <OneRepMaxChart />

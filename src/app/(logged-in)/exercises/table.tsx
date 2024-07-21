@@ -67,21 +67,21 @@ export function ExercisesTable({ exercises }: Props) {
         accessorKey: 'setOne',
         header: () => <div className="text-right">Set 1</div>,
         cell: ({ row }) => {
-          return <div className="capitalize font-medium text-right">{row.getValue('setOne')}</div>
+          return <div className="text-right font-medium capitalize">{row.getValue('setOne')}</div>
         },
       },
       {
         accessorKey: 'setTwo',
         header: () => <div className="text-right">Set 2</div>,
         cell: ({ row }) => {
-          return <div className="capitalize font-medium text-right">{row.getValue('setTwo')}</div>
+          return <div className="text-right font-medium capitalize">{row.getValue('setTwo')}</div>
         },
       },
       {
         accessorKey: 'setThree',
         header: () => <div className="text-right">Set 3</div>,
         cell: ({ row }) => {
-          return <div className="capitalize font-medium text-right">{row.getValue('setThree')}</div>
+          return <div className="text-right font-medium capitalize">{row.getValue('setThree')}</div>
         },
       },
       {
@@ -89,7 +89,7 @@ export function ExercisesTable({ exercises }: Props) {
         header: () => <div className="text-right">Set 4</div>,
         cell: ({ row }) => {
           return (
-            <div className="capitalize font-medium text-right">
+            <div className="text-right font-medium capitalize">
               {row.getValue('setFour') ?? 'N/A'}
             </div>
           )
@@ -104,7 +104,7 @@ export function ExercisesTable({ exercises }: Props) {
       {
         accessorKey: 'name',
         header: () => <div className="text-left">Exercise</div>,
-        cell: ({ row }) => <div className="capitalize font-medium">{row.getValue('name')}</div>,
+        cell: ({ row }) => <div className="font-medium capitalize">{row.getValue('name')}</div>,
       },
       {
         accessorKey: 'createdAt',
@@ -131,9 +131,9 @@ export function ExercisesTable({ exercises }: Props) {
             <div className="w-full text-right">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
+                  <Button variant="ghost" className="size-8 p-0">
                     <span className="sr-only">Open menu</span>
-                    <DotsHorizontalIcon className="h-4 w-4" />
+                    <DotsHorizontalIcon className="size-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -147,7 +147,7 @@ export function ExercisesTable({ exercises }: Props) {
         },
       },
     ],
-    [],
+    [setColumns],
   )
 
   const table = useReactTable({
@@ -171,14 +171,14 @@ export function ExercisesTable({ exercises }: Props) {
 
   return (
     <div className="w-full max-w-5xl">
-      <form className="flex items-center mb-4">
+      <form className="mb-4 flex items-center">
         <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute left-2.5 top-2.5 size-4" />
           <Input
             placeholder="Search exercises"
             value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
             onChange={(event) => table.getColumn('name')?.setFilterValue(event.target.value)}
-            className="w-full appearance-none bg-background pl-8 shadow-none md:w-72"
+            className="bg-background w-full appearance-none pl-8 shadow-none md:w-72"
           />
         </div>
       </form>
@@ -221,9 +221,8 @@ export function ExercisesTable({ exercises }: Props) {
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+        <div className="text-muted-foreground flex-1 text-sm">
+          {table.getFilteredRowModel().rows.length} row(s).
         </div>
         <div className="space-x-2">
           <Button

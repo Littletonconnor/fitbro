@@ -1,5 +1,6 @@
 'use client'
 
+import * as React from 'react'
 import Link from 'next/link'
 import { useFormState, useFormStatus } from 'react-dom'
 
@@ -20,7 +21,7 @@ export default function Login() {
           <CardDescription>Enter your email below to login to your account</CardDescription>
         </CardHeader>
         <CardContent>
-          {state?.errors && <p className="text-sm mb-4 text-red-600">{state.errors[0]}</p>}
+          {state?.errors && <p className="mb-4 text-sm text-red-600">{state.errors[0]}</p>}
           <form action={dispatch} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -48,6 +49,7 @@ export default function Login() {
                 id="password"
                 name="password"
                 type="password"
+                aria-describedby="password-error"
                 aria-invalid={!!state?.fieldErrors?.password}
               />
               {state?.fieldErrors?.password && (
@@ -60,7 +62,7 @@ export default function Login() {
           </form>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{' '}
-            <Link href="#" className="underline">
+            <Link href="/signup" className="underline">
               Sign up
             </Link>
           </div>
@@ -83,11 +85,11 @@ function LoginButton() {
     <Button
       type="submit"
       disabled={pending}
-      className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full disabled:cursor-not-allowed disabled:opacity-50"
       aria-disabled={pending}
       onClick={handleClick}
     >
-      Create an account
+      Log in
     </Button>
   )
 }
