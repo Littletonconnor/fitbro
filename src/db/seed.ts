@@ -39,8 +39,9 @@ async function createUsers() {
     .insert(usersSchema)
     .values(Array.from({ length: USERS }, createUser))
     .returning()
+  const personalUser = await createPersonalUser()
   console.timeEnd('👤 Created users')
-  return users
+  return [...personalUser, ...users]
 }
 
 async function createWorkouts(users: User[]) {
@@ -78,6 +79,21 @@ export async function createExercises(workouts: Workout[]) {
     .returning()
   console.timeEnd('🏋️‍♀️ Created exercises')
   return exercises
+}
+
+async function createPersonalUser() {
+  console.time('👤 Created personal user')
+  const user = await db
+    .insert(usersSchema)
+    .values({
+      ...createUser(),
+      name: 'Littleton Connor',
+      email: 'littletonconnor@gmail.com',
+      passwordHash: bcrypt.hashSync('root-123', 10),
+    })
+    .returning()
+  console.timeEnd('👤 Created personal user')
+  return user
 }
 
 export async function createSets(exercises: Exercise[]) {
