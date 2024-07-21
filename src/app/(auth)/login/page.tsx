@@ -11,7 +11,6 @@ import { authenticate } from '@/lib/actions'
 
 export default function Login() {
   const [state, dispatch] = useFormState(authenticate, undefined)
-  console.log('STATE', state)
 
   return (
     <div className="w-full py-20">
