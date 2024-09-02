@@ -116,7 +116,6 @@ export async function authenticate(_currentState: unknown, formData: FormData) {
 }
 
 export async function logout() {
-  console.log('REMOVING SESSION')
   await removeSession()
   redirect('/login')
 }

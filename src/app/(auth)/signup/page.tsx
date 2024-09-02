@@ -94,7 +94,7 @@ export default function LoginForm() {
           <div className="mt-4 text-center text-sm">
             Already have an account?{' '}
             <Link href="/login" className="underline">
-              Sign in
+              Login
             </Link>
           </div>
         </CardContent>

@@ -3,7 +3,7 @@
 import '@/styles/globals.css'
 
 import * as React from 'react'
-import { CircleUser, Home, Menu, Package, Package2, ShoppingCart } from 'lucide-react'
+import { CircleUser, Home, Package, Package2, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 
@@ -16,7 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/dropdown-menu'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/sheet'
 import { cn } from '@/lib/utils'
 
 interface RootLayoutProps {
@@ -67,25 +66,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </div>
       <div className="flex flex-col">
         <header className="bg-muted/40 flex h-14 items-center gap-4 border-b px-4 lg:h-[60px] lg:px-6">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="shrink-0 md:hidden">
-                <Menu className="size-5" />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="flex flex-col">
-              <nav className="grid gap-2 text-lg font-medium">
-                <Link href="#" className="flex items-center gap-2 text-lg font-semibold">
-                  <Package2 className="size-6" />
-                  <span className="sr-only">Acme Inc</span>
-                </Link>
-                {headerLinks.map((link) => (
-                  <NavLink key={link.href} {...link} />
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
           <div className="w-full flex-1" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

@@ -58,6 +58,7 @@ interface Props {
 }
 
 export function WeightChart({ exercises }: Props) {
+  console.log('exercises', exercises)
   const normalizedExercises = exercises.map((exercise) => {
     return {
       ...exercise,

@@ -19,9 +19,9 @@ function randomInt(min = 3, max = 5) {
 }
 
 const USERS = 3
-const WORKOUTS = randomInt()
-const EXERCISES = randomInt(20, 20)
-const SETS = randomInt(3, 3)
+const WORKOUTS = randomInt(5, 10)
+const EXERCISES = randomInt(5, 10)
+const SETS = randomInt(3, 5)
 
 const PERSONAL_WORKOUTS = 30
 const HISTORICAL_DAYS = 180
@@ -30,9 +30,11 @@ async function seed() {
   console.time('🌱 Database has been seeded.')
   await deleteData()
   const users = await createUsers()
-  const workouts = await createWorkouts(users)
-  const exercises = await createExercises(workouts)
-  await createSets(exercises)
+  for (const user of users) {
+    const workouts = await createWorkouts(user)
+    const exercises = await createExercises(workouts)
+    await createSets(exercises)
+  }
   console.timeEnd('🌱 Database has been seeded.')
 }
 
@@ -47,21 +49,18 @@ async function createUsers() {
   return [...personalUser, ...users]
 }
 
-async function createWorkouts(users: User[]) {
-  console.time('💪 Created workouts')
+async function createWorkouts(user: User) {
+  console.time(`💪 Created workouts for user ${user.id}`)
   const workouts = await db
     .insert(workoutsSchema)
     .values(
-      Array.from({ length: WORKOUTS }, () => {
-        const randomUser = users[randomInt(0, users.length - 1)]
-        return {
-          ...createWorkout(),
-          userId: randomUser.id,
-        }
-      }),
+      Array.from({ length: WORKOUTS }, () => ({
+        ...createWorkout(),
+        userId: user.id,
+      })),
     )
     .returning()
-  console.timeEnd('💪 Created workouts')
+  console.timeEnd(`💪 Created workouts for user ${user.id}`)
   return workouts
 }
 
@@ -72,7 +71,6 @@ export async function createExercises(workouts: Workout[]) {
     .values(
       Array.from({ length: EXERCISES }, () => {
         const randomWorkout = workouts[randomInt(0, workouts.length - 1)]
-
         return {
           ...createExercise(),
           workoutId: randomWorkout.id,
@@ -84,30 +82,18 @@ export async function createExercises(workouts: Workout[]) {
   return exercises
 }
 
-// async function createPersonalUser() {
-//   console.time('👤 Created personal user')
-//   const user = await db
-//     .insert(usersSchema)
-//     .values({
-//       ...createUser(),
-//       name: 'Littleton Connor',
-//       email: 'littletonconnor@gmail.com',
-//       passwordHash: bcrypt.hashSync('root-123', 10),
-//     })
-//     .returning()
-//   console.timeEnd('👤 Created personal user')
-//   return user
-// }
-
 export async function createSets(exercises: Exercise[]) {
   console.time('📶 Created Sets')
   const setValues = []
-  for (let i = 0; i < EXERCISES; i++) {
+  for (const exercise of exercises) {
+    let weight = faker.number.int({ min: 100, max: 200 })
     for (let j = 0; j < SETS; j++) {
       setValues.push({
         ...createSet(),
-        exerciseId: exercises[i].id,
+        exerciseId: exercise.id,
+        weight: weight,
       })
+      weight += faker.number.int({ min: -5, max: 5 }) // Simulate slow linear progression
     }
   }
   const sets = await db.insert(setsSchema).values(setValues).returning()
@@ -186,12 +172,10 @@ async function createPersonalUser() {
     })
     .returning()
 
-  const workouts = Array.from({ length: PERSONAL_WORKOUTS }, () => {
-    return {
-      ...createWorkout(),
-      userId: user[0].id,
-    }
-  })
+  const workouts = Array.from({ length: PERSONAL_WORKOUTS }, () => ({
+    ...createWorkout(),
+    userId: user[0].id,
+  }))
   await db.insert(workoutsSchema).values(workouts)
 
   let exercises: Exercise[] = []
@@ -205,8 +189,10 @@ async function createPersonalUser() {
 
   const sets: Set[] = []
   for (const exercise of exercises) {
+    let weight = faker.number.int({ min: 100, max: 200 })
     for (let i = 0; i < SETS; i++) {
-      sets.push({ ...createSet(HISTORICAL_DAYS), exerciseId: exercise.id })
+      sets.push({ ...createSet(HISTORICAL_DAYS), exerciseId: exercise.id, weight: weight })
+      weight += faker.number.int({ min: -5, max: 5 }) // Simulate slow linear progression
     }
   }
   await db.insert(setsSchema).values(sets)
